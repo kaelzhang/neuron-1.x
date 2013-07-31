@@ -30,38 +30,38 @@ module.exports = function( grunt ) {
             active: {
                 dest: 'dist/neuron.js',
                 src: [
-                    "seed.js",
-                    "lang/native.js",
-                    "lang/enhance.js",
-                    "lang/web.js",
+                    "lib/seed.js",
+                    "lib/lang/native.js",
+                    "lib/lang/enhance.js",
+                    "lib/lang/web.js",
 
-                    "oop/class.js",
-                    "oop/attrs.js",
-                    "oop/events.js",
+                    "lib/oop/class.js",
+                    "lib/oop/attrs.js",
+                    "lib/oop/events.js",
 
-                    "selector/finder.js",
-                    "selector/parser.js",
-                    "selector/adapter.js",
+                    "lib/selector/finder.js",
+                    "lib/selector/parser.js",
+                    "lib/selector/adapter.js",
 
-                    "ua/ua.js",
+                    "lib/ua/ua.js",
 
-                    "dom/dom.js",
-                    "dom/feature.js",
-                    "dom/event.js",
-                    "dom/css.js",
-                    "dom/traverse.js",
-                    "dom/manipulate.js",
-                    "dom/create.js",
-                    "dom/domready.js",
+                    "lib/dom/dom.js",
+                    "lib/dom/feature.js",
+                    "lib/dom/event.js",
+                    "lib/dom/css.js",
+                    "lib/dom/traverse.js",
+                    "lib/dom/manipulate.js",
+                    "lib/dom/create.js",
+                    "lib/dom/domready.js",
                     
-                    "loader/assets.js",
-                    "loader/active.js",
-                    "loader/active-config.js",
+                    "lib/loader/assets.js",
+                    "lib/loader/active.js",
+                    "lib/loader/active-config.js",
                     
-                    "biz/biz.js",
-                    "biz/hippo.js",
+                    "lib/biz/biz.js",
+                    "lib/biz/hippo.js",
 
-                    "cleaner.js"
+                    "lib/cleaner.js"
                 ]
             },
 

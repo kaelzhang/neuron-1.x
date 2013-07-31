@@ -28,7 +28,7 @@ module.exports = function( grunt ) {
             // }, 
 
             active: {
-                dest: 'dist/neuron.js',
+                dest: 'dist/neuron-active.js',
                 src: [
                     "lib/seed.js",
                     "lib/lang/native.js",

@@ -5832,44 +5832,34 @@ function _define(path, dependencies, factory){
         }
     }
 
-    switch(K._type(factory)){
-        
-        // define(deps, factory);
-        // define(factory);
-        case 'function':
-            mod.f = factory;
+    if(typeof factory === 'function'){
+        mod.f = factory;
 
-            mod.deps = dependencies;
+        mod.deps = dependencies;
 
-            // on module script load
-            mod.ol = function () {
-                var mod = this;
+        // on module script load
+        mod.ol = function () {
+            var mod = this;
 
-                if(mod.deps && mod.deps.length){
-                    _provide(mod.deps, function(){
-                        generateExports(mod);
-
-                    }, mod, true);
-
-                // If there's no dependencies, generate exports
-                }else{
+            if(mod.deps && mod.deps.length){
+                _provide(mod.deps, function(){
                     generateExports(mod);
-                }
-            };
-            
-            break;
-            
-        // define(exports)
-        case 'object':
-            mod.exports = factory;
 
-            mod.ol = function () {
-                tidyModuleData(this);
-            };
+                }, mod, true);
 
-            break;
+            // If there's no dependencies, generate exports
+            }else{
+                generateExports(mod);
+            }
+        };
+
+    }else if(Object(factory) === factory){
+        mod.exports = factory;
+
+        mod.ol = function () {
+            tidyModuleData(this);
+        };
     }
-
 
     // if already have path
     if(path){

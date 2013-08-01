@@ -6507,20 +6507,12 @@ function getURI(path){
             product_path = combos[md5];
         }else{
             product_path = path.replace(REGEX_REPLACE_EXTENSION, function (extension) {
-                return '.min.' + md5 + extension; 
+                return '.min.' + md5 + extension;
             });
         }
     }
 
-    return 'http://' + server.replace(/\{n\}/g, path.length % 3 + 1) + product_path;
-};
-
-
-function getConfig(key, config){
-    var ret = config[key];
-    delete config[key];
-    
-    return ret && ret + extra;
+    return 'http://' + server.replace(/\{n\}/g, product_path.length % 3 + 1) + product_path;
 };
 
 function loaderError(message){

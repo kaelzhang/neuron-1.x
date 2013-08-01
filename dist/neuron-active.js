@@ -5664,32 +5664,32 @@ getLocation = K.getLocation,
  * @enum {number}
  * @const
  */    
-STATUS = {
-    // the module's uri has been specified, 
-    // DI -> DEFINING
-    DI    : 1,
+// STATUS = {
+//     // the module's uri has been specified, 
+//     // DI -> DEFINING
+//     DI    : 1,
 
-    // the module's source uri is downloading or executing
-    // LD -> LOADING
-    LD    : 2,
+//     // the module's source uri is downloading or executing
+//     // LD -> LOADING
+//     LD    : 2,
     
-    // the module has been explicitly defined. 
-    // DD -> DEFINED
-    DD     : 3,
+//     // the module has been explicitly defined. 
+//     // DD -> DEFINED
+//     DD     : 3,
     
-    // being analynizing and requiring the module's dependencies
-    // RQ -> REQUIRING
-    RQ     : 4,
+//     // being analynizing and requiring the module's dependencies
+//     // RQ -> REQUIRING
+//     RQ     : 4,
     
-    // the module's factory function are ready to be executed
-    // the module's denpendencies are set as STATUS.RD
-    // RD -> READY
-    RD     : 5 //,
+//     // the module's factory function are ready to be executed
+//     // the module's denpendencies are set as STATUS.RD
+//     // RD -> READY
+//     RD     : 5 //,
     
-    // the module already has exports
-    // the module has been initialized, i.e. the module's factory function has been executed
-    // ATTACHED      : 6
-},
+//     // the module already has exports
+//     // the module has been initialized, i.e. the module's factory function has been executed
+//     // ATTACHED      : 6
+// },
 
 asset = K.load;
 
@@ -5772,7 +5772,8 @@ function _define(path, dependencies, factory){
     existed,
     active_script_uri;
 
-    // anonymous module define
+    // Anonymous module define
+    // When neuron loader load an anonymous module
     if(!path){
         // via Kris Zyp
         // Ref: http://kael.me/-iikz
@@ -5812,31 +5813,51 @@ function _define(path, dependencies, factory){
             _last_anonymous_mod = mod;
 
         }else{
-            mod = getModuleByPath( Loader.santitize( getLocation(active_script_uri).pathname ) );
+            path = Loader.santitize( getLocation(active_script_uri).pathname );
+            mod = getModuleByPath(path);
+        }
+
+    }else{
+        existed = getModuleByPath(path);
+
+        // if exists, this means the module is defining with a path in a script file
+        if(existed){
+            mod = existed;
+        
+        // Or create new module
+        }else{
+            registerMod(path, mod);
         }
     }
-    
+
     switch(K._type(factory)){
         
         // define(deps, factory);
         // define(factory);
         case 'function':
             mod.f = factory;
-            
-            // if dependencies is explicitly defined, loader will never parse them from the factory function
-            // so, to define a standalone module, you can set dependencies as []
-            
-            // if(!dependencies){
-            //    dependencies = parseDependencies(factory);
-            // }
+
+            mod.deps = dependencies;
+
+            // on module script load
+            mod.ol = function () {
+                var mod = this;
+
+                if(mod.deps){
+                    _provide(mod.deps, function(){
+                        generateExports(mod);
+
+                    }, mod, true);
+                    
+                }else{
+                    generateExports(mod);
+                }
+                
+            };
             
             if(dependencies && dependencies.length){
-                mod.s = STATUS.DD;
-                
                 // only if defined with factory function, can a module has dependencies
-                mod.deps = dependencies;
-            }else{
-                mod.s = STATUS.RD;
+                
             }
             
             break;
@@ -5844,17 +5865,19 @@ function _define(path, dependencies, factory){
         // define(exports)
         case 'object':
             mod.exports = factory;
-            
-            // tidy module data, when fetching interactive script succeeded
-            active_script_uri && tidyModuleData(mod);
-            uri = NULL;
+
+            mod.ol = function () {
+                onModuleScriptLoad = NULL;
+                tidyModuleData(this);
+            };
+
             break;
     }
-    
+
+
+    // if already have path
     if(path){
-        existed = getModuleByPath(path);
-        existed ? ( mod = K.mix(existed, mod) ) : registerMod(path, mod);
-        mod.i = path;
+        mod.ol && mod.ol();
     }
     
     // internal use
@@ -5929,7 +5952,7 @@ function _provide(dependencies, callback, env, noCallbackArgs){
                         cb();
                     }
                 }
-            }, mod);
+            });
         });
     }
 };
@@ -5996,15 +6019,14 @@ function getOrDefine(urn, env){
     if(!mod){
         // always define the module url when providing
         mod = _define(path);
-        mod.s = STATUS.DI;
 
         if(REGEX_IS_CSS.test(path)){
             mod.isCSS = true;
         }
-    }
-    
-    if(namespace){
-        mod.ns = namespace;
+
+        if(namespace){
+            mod.ns = namespace;
+        }
     }
     
     return mod;
@@ -6022,81 +6044,32 @@ function getOrDefine(urn, env){
          n: {string} namespace of the caller module
    }
  */
-function provideOne(mod, callback, env){
-    var status = mod.s, 
-        parent, cb,
-        _STATUS = STATUS;
-    
+function provideOne(mod, callback){
+
     // Ready -> 5
     // provideOne method won't initialize the module or execute the factory function
-    if(mod.exports || status === _STATUS.RD){
+    if(mod.exports){
         callback();
     
-    }else if(status >= _STATUS.DD){
-        cb = function(){
-            var ready = _STATUS.RD;
-            
-            // function cb may be executed more than once,
-            // because a single module might be being required by many other modules simultainously.
-            // after a certain intermediate process, maybe the module has been initialized and attached(has 'exports') 
-            // and its status has been deleted.
-            // so, mod.s must be checked before we set it as 'ready'
-            
-            // undefined < ready => false
-            if(mod.s < ready){
-                mod.s = ready;
-            }
-            
-            callback();
-        };
-    
-        // Defined -> 3
-        if(status === _STATUS.DD){
-            mod.s = _STATUS.RQ;
-            mod.pending = [cb];
-            
-            // recursively loading dependencies
-            _provide(mod.deps, function(){
-                var m = mod;
-                for_each(m.pending, function(c){
-                    c();
-                });
-                
-                m.pending.length = 0;
-                delete m.pending;
-            }, env, true);
-            
-        // Requiring -> 4
-        }else{
-            mod.pending.push(cb);
-        }
-    
-    }else if(status < _STATUS.DD){
+    }else{
+        mod.p.push(callback);
         loadModuleSrc(mod, function(){
-            var last = _last_anonymous_mod;
+            var last;
             
             // CSS dependency
             if(mod.isCSS){
-                mod.s = _STATUS.RD;
-                delete mod.u;
+
+                // fake exports
+                mod.exports = true;
             
             // Loading -> 2
             // handle with anonymous module define
-            }else if(last && mod.s === _STATUS.LD){
-                
-                if(last.s < _STATUS.DD){
-                    error(510);
-                }
-                
-                K.mix(mod, last);
+            }else if(last = _last_anonymous_mod){
                 _last_anonymous_mod = NULL;
                 
-                // when after loading a library module, 
-                // and IE didn't fire onload event during the insertion of the script node
-                tidyModuleData(mod);
+                K.mix(mod, last);
+                mod.ol && mod.ol();
             }
-            
-            provideOne(mod, callback, env);
         });
     }
 };
@@ -6111,11 +6084,9 @@ function provideOne(mod, callback, env){
  */
 function createRequire(envMod){
     return function(id){
-        var mod = getOrDefine(id, envMod);
-        
-        return mod.exports || generateExports(mod);
+        return getOrDefine(id, envMod).exports;
     };
-};
+}
 
 
 /**
@@ -6126,27 +6097,24 @@ function generateExports(mod){
     var module = {
             exports: exports
         };
-    var factory;
-    var ret;
-        
-    if(mod.s === STATUS.RD && K.isFunction(factory = mod.f) ){
+
+    var factory = mod.f;
     
-        // to keep the object mod away from the executing context of factory,
-        // use factory instead mod.f,
-        // preventing user from fetching runtime data by 'this'
-        ret = factory(K, createRequire(mod), exports, module);
+    // to keep the object mod away from the executing context of factory,
+    // use factory instead mod.f,
+    // preventing user from fetching runtime data by 'this'
+    var ret = factory(K, createRequire(mod), exports, module);
         
-        // backward legacy
-        if(ret){
-            module.exports = ret;
-        }
-        
-        mod.exports = module.exports;
-        tidyModuleData(mod);
+    // backward legacy
+    if(ret){
+        module.exports = ret;
     }
+    
+    mod.exports = module.exports;
+    tidyModuleData(mod);
         
     return mod.exports;
-};
+}
 
 
 function tidyModuleData(mod){
@@ -6160,17 +6128,25 @@ function tidyModuleData(mod){
         }
         
         delete mod.f;
-        delete mod.s;
 
         // never delete `mod.i` or `mod.ns`, coz `require` method might be executed after module factory executed
         // delete mod.i
         // delete mod.ns;
 
+        if(mod.p){
+            for_each(mod.p, function(c){
+                c();
+            });
+            
+            mod.p.length = 0;
+        }
+
         delete mod.p;
+        delete mod.ol;
     }
     
     return mod;
-};
+}
 
 
 /**
@@ -6203,7 +6179,7 @@ function loadScript(uri, callback, type){
         };
     
     node = asset[ type ](uri, cb);
-};
+}
 
 
 /**
@@ -6214,30 +6190,29 @@ function loadModuleSrc(mod, callback){
     var path = mod.i;
     var uri = Loader.getURI(path);
 
-    var script = _script_map[uri];
-    var LOADED = 1;
-
-    if (script === LOADED){
-        callback();
-
-    }else if (!script) {
-        script = _script_map[uri] = [callback];
-        mod.s = STATUS.LD;
+    if (!_script_map[uri]) {
+        _script_map[uri] = true;
         
         loadScript(uri, function(){
-            _script_map[uri] = LOADED;
-
-            for_each(script, function(s){
-                s();
-            });
-
-            script.length = 0;
+            var last;
             
-        }, mod.isCSS ? 'css' : 'js');
-        
-    } else {
-        script.push(callback);
-    }    
+            // CSS dependency
+            if(mod.isCSS){
+
+                // fake exports
+                mod.exports = true;
+            
+            // Loading -> 2
+            // handle with anonymous module define
+            }else if(last = _last_anonymous_mod){
+                K.mix(mod, last);
+                last = _last_anonymous_mod = NULL;
+                
+                mod.ol && mod.ol();
+            }
+            
+        }, mod.isCSS ? 'css' : 'js');   
+    }
 };
 
 
@@ -6283,6 +6258,8 @@ function getModuleByPath(path){
 
 function registerMod(path, mod){
     _mods[path] = mod;
+    mod.i = path;
+    mod.p = [];
 };
 
 

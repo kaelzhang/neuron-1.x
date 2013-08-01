@@ -6426,6 +6426,10 @@ function for_each(arr, fn){
 
 define.__mods = _mods;
 
+// backward legacy
+define.on = NOOP;
+define.off = NOOP;
+
 
 // use extend method to add public methods, 
 // so that google closure will NOT minify Object properties

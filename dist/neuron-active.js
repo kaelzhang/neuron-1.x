@@ -6230,6 +6230,8 @@ function loadModuleSrc(mod, callback){
             for_each(script, function(s){
                 s();
             });
+
+            script.length = 0;
             
         }, mod.isCSS ? 'css' : 'js');
         

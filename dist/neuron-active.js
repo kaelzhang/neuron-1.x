@@ -152,7 +152,7 @@ K._type = function(){
 /**
  * build time will be replaced when packaging and compressing
  */
-K.build = '2013-07-31';
+K.build = '2013-08-01';
 
 
 /**
@@ -6216,24 +6216,21 @@ function loadModuleSrc(mod, callback){
 
     var script = _script_map[uri];
     var LOADED = 1;
-        
-    if (!script) {
+
+    if (script === LOADED){
+        callback();
+
+    }else if (!script) {
         script = _script_map[uri] = [callback];
         mod.s = STATUS.LD;
         
         loadScript(uri, function(){
-            var m = mod;
-                
+            _script_map[uri] = LOADED;
+
             for_each(script, function(s){
-                s.call(m);
+                s();
             });
             
-            // TODO:
-            // test
-            // _script_map[uri] = LOADED;
-            
-            // the logic of loader ensures that, once a uri completes loading, it will never be requested 
-            // delete _script_map[uri];
         }, mod.isCSS ? 'css' : 'js');
         
     } else {

@@ -2,9 +2,6 @@
 
 cwd=$1
 
-for js in $(find "$cwd" | grep .js)
-do
-    if [[ ${js: -3} == ".js" ]]; then
-        node scan.js "$js"
-    fi
-done
+find "$cwd" | grep .js > list.txt
+
+node scan.js

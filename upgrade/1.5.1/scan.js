@@ -4,45 +4,61 @@ var node_fs = require('fs');
 var uglifyjs = require('uglify-js');
 var get_deps = require('./deps');
 
-var file = process.argv[2];
 
-if(/[a-z0-9]{32}\.js$/.test(file)){
-    return;
-}
+var parser = {
+    parse: function (path) {
+        parser.path = path;
 
-console.log('file', file);
+        console.log('file', path);
 
-function check(deps){
-    console.log('check deps', deps);
+        // node scan.js xxxx.js
+        var content = node_fs.readFileSync(path);
+        var ast = uglifyjs.parse(content.toString());
+        ast.walk(parser.walker);
+    },
 
-    deps.some(function (dep) {
-        var name;
+    walker: new uglifyjs.TreeWalker(function (node) {
+        var deps = get_deps(node);
 
-        if( ~ dep.indexOf('::') ){
-            name = dep.split('::')[1];
-        }else{
-            name = dep;
+        if(deps){
+            parser.check(deps);
         }
+    }),
 
-        if( name.indexOf('/') === 0 ){
-            console.log('invalid identifier');
-            node_fs.writeFileSync('scan.log', file + '\n');
-        }
-    });
-}
+    check: function(deps){
+        var file = parser.path;
 
+        console.log('check deps', deps);
 
-// node scan.js xxxx.js
-var content = node_fs.readFileSync(file);
+        deps.some(function (dep) {
+            var name;
 
-var ast = uglifyjs.parse(content.toString());
+            if( ~ dep.indexOf('::') ){
+                name = dep.split('::')[1];
+            }else{
+                name = dep;
+            }
 
-var walker = new uglifyjs.TreeWalker(function (node) {
-    var deps = get_deps(node);
-
-    if(deps){
-        check(deps);
+            if( name.indexOf('/') === 0 ){
+                console.log('invalid identifier');
+                node_fs.writeFileSync('scan.log', file + '\n');
+            }
+        });
     }
+}
+
+
+var files = node_fs.readFileSync( 'list.txt' ).toString().split( /\r|\n/g );
+
+console.log(files)
+
+files.filter(function (path) {
+    return /\.js$/.test(path) && !/[a-z0-9]{32}\.js$/.test(path);
+
+}).forEach(function (path) {
+    parser.parse(path);
 });
 
-ast.walk(walker);
+
+
+

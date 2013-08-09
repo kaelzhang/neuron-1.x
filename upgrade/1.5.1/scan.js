@@ -6,6 +6,10 @@ var get_deps = require('./deps');
 
 var file = process.argv[2];
 
+if(/[a-z0-9]{32}\.js$/.test(file)){
+    return;
+}
+
 console.log('file', file);
 
 function check(deps){

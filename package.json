@@ -25,6 +25,8 @@
     "grunt": "~0.4.1",
     "grunt-contrib-jshint": "~0.4.3",
     "grunt-contrib-uglify": "~0.2.0",
-    "grunt-contrib-clean": "~0.4.1"
-  }
+    "grunt-contrib-clean": "~0.4.1",
+    "uglify-js": "~2.3.6"
+  },
+  "dependencies": {}
 }

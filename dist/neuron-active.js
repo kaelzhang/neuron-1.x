@@ -6441,7 +6441,7 @@ var REGEX_REPLACE_EXTENSION = /\.[a-z0-9]+$/;
 
 
 var debug_mode = ~ document.cookie.indexOf('neuron-debug');
-var timestamp = Date.now();
+var timestamp = + new Date;
 
 function getURI(path){
     var server = path.indexOf(libBase) === 0 ? libServer : appServer;

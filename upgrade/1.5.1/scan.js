@@ -11,10 +11,14 @@ var parser = {
 
         console.log('file', path);
 
-        // node scan.js xxxx.js
-        var content = node_fs.readFileSync(path);
-        var ast = uglifyjs.parse(content.toString());
-        ast.walk(parser.walker);
+        try {
+            // node scan.js xxxx.js
+            var content = node_fs.readFileSync(path);
+            var ast = uglifyjs.parse(content.toString());
+            ast.walk(parser.walker);
+        } catch(e) {
+            
+        }
     },
 
     walker: new uglifyjs.TreeWalker(function (node) {
@@ -49,8 +53,6 @@ var parser = {
 
 
 var files = node_fs.readFileSync( 'list.txt' ).toString().split( /\r|\n/g );
-
-console.log(files)
 
 files.filter(function (path) {
     return /\.js$/.test(path) && !/[a-z0-9]{32}\.js$/.test(path);

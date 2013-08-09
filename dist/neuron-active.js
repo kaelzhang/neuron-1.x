@@ -152,7 +152,7 @@ K._type = function(){
 /**
  * build time will be replaced when packaging and compressing
  */
-K.build = '2013-08-01';
+K.build = '2013-08-09';
 
 
 /**
@@ -6439,13 +6439,16 @@ function santitize(identifier){
 
 var REGEX_REPLACE_EXTENSION = /\.[a-z0-9]+$/;
 
+
+var debug_mode = ~ document.cookie.indexOf('neuron-debug');
+var timestamp = Date.now();
+
 function getURI(path){
     var server = path.indexOf(libBase) === 0 ? libServer : appServer;
 
-    var md5 = urls[path];
     var product_path = path;
 
-    if(md5){
+    if( !debug_mode && (md5 = urls[path]) ){
         if(combos[md5]){
             product_path = combos[md5];
         }else{
@@ -6453,6 +6456,8 @@ function getURI(path){
                 return '.min.' + md5 + extension;
             });
         }
+    }else{
+        product_path += '?' + timestamp;
     }
 
     return 'http://' + server.replace(/\{n\}/g, product_path.length % 3 + 1) + product_path;

@@ -152,7 +152,7 @@ K._type = function(){
 /**
  * build time will be replaced when packaging and compressing
  */
-K.build = '2013-08-09';
+K.build = '2013-08-21';
 
 
 /**
@@ -6448,16 +6448,18 @@ function getURI(path){
 
     var product_path = path;
 
-    if( !debug_mode && (md5 = urls[path]) ){
-        if(combos[md5]){
-            product_path = combos[md5];
+    if( !debug_mode ){
+        if( md5 = urls[path] ){
+            if(combos[md5]){
+                product_path = combos[md5];
+            }else{
+                product_path = path.replace(REGEX_REPLACE_EXTENSION, function (extension) {
+                    return '.min.' + md5 + extension;
+                });
+            }
         }else{
-            product_path = path.replace(REGEX_REPLACE_EXTENSION, function (extension) {
-                return '.min.' + md5 + extension;
-            });
+            product_path += '?' + timestamp;
         }
-    }else{
-        product_path += '?' + timestamp;
     }
 
     return 'http://' + server.replace(/\{n\}/g, product_path.length % 3 + 1) + product_path;

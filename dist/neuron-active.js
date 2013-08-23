@@ -152,7 +152,7 @@ K._type = function(){
 /**
  * build time will be replaced when packaging and compressing
  */
-K.build = '2013-08-21';
+K.build = '2013-08-23';
 
 
 /**
@@ -1021,7 +1021,7 @@ K.toQueryString = function(obj, splitter){
 				
 				// abandon deep object members
 				// copy depth: 1
-				return d < 2;
+				return d < 3;
 			}
 		), splitter)
 		

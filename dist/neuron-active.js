@@ -6077,6 +6077,10 @@ function generateExports(mod){
             exports: exports
         };
 
+    if(mod.exports){
+        return;
+    }
+
     var factory = mod.f;
     
     // to keep the object mod away from the executing context of factory,

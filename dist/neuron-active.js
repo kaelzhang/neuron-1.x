@@ -152,7 +152,7 @@ K._type = function(){
 /**
  * build time will be replaced when packaging and compressing
  */
-K.build = '2013-08-23';
+K.build = '2013-08-26';
 
 
 /**
@@ -6074,6 +6074,10 @@ function generateExports(mod){
     var module = {
             exports: exports
         };
+
+    if(module.exports){
+        return;
+    }
 
     var factory = mod.f;
     

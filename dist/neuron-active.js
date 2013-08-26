@@ -5840,6 +5840,7 @@ function _define(path, dependencies, factory){
         // on module script load
         mod.ol = function () {
             var mod = this;
+            delete mod.ol;
 
             if(mod.deps && mod.deps.length){
                 _provide(mod.deps, function(){
@@ -5857,6 +5858,7 @@ function _define(path, dependencies, factory){
         mod.exports = factory;
 
         mod.ol = function () {
+            delete this.ol;
             tidyModuleData(this);
         };
     }
@@ -6075,10 +6077,6 @@ function generateExports(mod){
             exports: exports
         };
 
-    if(module.exports){
-        return;
-    }
-
     var factory = mod.f;
     
     // to keep the object mod away from the executing context of factory,
@@ -6113,7 +6111,6 @@ function tidyModuleData(mod){
     mod.p.length = 0;
 
     delete mod.p;
-    delete mod.ol;
     
     return mod;
 }

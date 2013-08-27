@@ -6435,7 +6435,10 @@ function getURI(path){
 
     var product_path = path;
 
+    // if on debug mode, no more decorations
     if( !debug_mode ){
+
+        // if has version information
         if( md5 = urls[path] ){
             if(combos[md5]){
                 product_path = combos[md5];
@@ -6444,9 +6447,17 @@ function getURI(path){
                     return '.min.' + md5 + extension;
                 });
             }
-        }else{
-            product_path += '?' + timestamp;
         }
+
+        // No longer add timestamp, the reason is:
+        // 1. timestamp might cause errors during the deploying of a new version 
+        //      due to a failure of the web cache,
+        //      although it could solve the problems caused by lack of version
+        // 2. which is bad for debugging
+
+        // else if( /\.dianping\.com/.test(location.hostname) ){
+        //     product_path += '?' + timestamp;
+        // }
     }
 
     return 'http://' + server.replace(/\{n\}/g, product_path.length % 3 + 1) + product_path;

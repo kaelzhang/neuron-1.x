@@ -152,7 +152,7 @@ K._type = function(){
 /**
  * build time will be replaced when packaging and compressing
  */
-K.build = '2013-08-26';
+K.build = '2013-08-27';
 
 
 /**
@@ -4720,7 +4720,7 @@ function overloadDOMGetterSetter(methods, getterArgLength){
  */
 function getFirstContext(element){
 	if(typeof element === 'string'){
-		element = DOM.one(element);
+		element = DOM(element);
 	}
 
 	element = (element instanceof DOM) ? element.el(0) : element;

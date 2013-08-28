@@ -152,7 +152,7 @@ K._type = function(){
 /**
  * build time will be replaced when packaging and compressing
  */
-K.build = '2013-08-27';
+K.build = '2013-08-28';
 
 
 /**
@@ -5283,7 +5283,7 @@ function bind_domready(){
 		try {
 			// doScroll technique by Diego Perini http://javascript.nwbox.com/IEContentLoaded/
 			doScroll('left');
-			ready();
+			_ready();
 		} catch(ex) {
 			setTimeout(poll_scroll, 10);
 		}

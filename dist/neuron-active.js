@@ -152,7 +152,7 @@ K._type = function(){
 /**
  * build time will be replaced when packaging and compressing
  */
-K.build = '2013-08-28';
+K.build = '2013-11-23';
 
 
 /**
@@ -6510,6 +6510,37 @@ Loader.appBase      = appBase;
 Loader.libBase      = libBase;
 Loader.getURI       = getURI;
 
+
+var __combos = window.__loaderCombo || {};
+
+function parseCombos (combos) {
+    var combo;
+    var paths;
+    var counter = 0;
+    var id;
+    var urls = {};
+    var combo_urls = {};
+
+    for (combo in combos){
+        paths = combos[combo];
+        id = 'combo_' + counter; 
+
+        combo = K.getLocation(combo);
+
+        combo_urls[id] = combo.pathname;
+        paths.forEach(function(path){
+            urls[path] = id;
+        });
+
+        counter ++;
+    }
+
+    return {
+        urls: urls,
+        combos: combo_urls
+    }
+}
+
 // Loader.init will be called at the end of module-version.js
 // @param {Object} url_map
 // {
@@ -6525,6 +6556,12 @@ Loader.init = function(url_map, combo_map){
         urls = url_map;
         combos = combo_map;
     }
+
+    if (__combos) {
+        __combos = parseCombos(__combos);
+        K.mix(urls, __combos.urls);
+        K.mix(combos, __combos.combos);
+    };
 
     K.provide = provide;
     

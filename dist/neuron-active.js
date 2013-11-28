@@ -152,7 +152,7 @@ K._type = function(){
 /**
  * build time will be replaced when packaging and compressing
  */
-K.build = '2013-11-23';
+K.build = '2013-11-28';
 
 
 /**
@@ -4420,10 +4420,13 @@ DOM.methods.css = {
 					// is number string and the current style type need 'px' suffix
 					// -> .css('margin', '20')   
 					// -> .css('margin', 20)
+
+                    // NaN + '' === '' + Number('NaN')
 					(value += '') && value === '' + Number(value)
 				)
 			){
-				value += 'px';
+                // fix NaN -> 0
+				value = ( Number(value) || 0 ) + 'px';
 			}
 			
 			el.style[name] = value;

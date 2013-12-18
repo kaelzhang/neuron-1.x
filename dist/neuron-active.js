@@ -152,7 +152,7 @@ K._type = function(){
 /**
  * build time will be replaced when packaging and compressing
  */
-K.build = '2013-11-28';
+K.build = '2013-12-18';
 
 
 /**
@@ -6410,7 +6410,7 @@ K.__loader = Loader;
 function CDNHasher(evidence, isLibMod){
     var s = isLibMod ? server : appServer;
 
-	return 'http://' + K.sub(s, {n: evidence.length % 3 + 1});
+	return '//' + K.sub(s, {n: evidence.length % 3 + 1});
 };
 
 
@@ -6463,7 +6463,7 @@ function getURI(path){
         // }
     }
 
-    return 'http://' + server.replace(/\{n\}/g, product_path.length % 3 + 1) + product_path;
+    return '//' + server.replace(/\{n\}/g, product_path.length % 3 + 1) + product_path;
 };
 
 function loaderError(message){

@@ -152,7 +152,7 @@ K._type = function(){
 /**
  * build time will be replaced when packaging and compressing
  */
-K.build = '2013-12-18';
+K.build = '2013-12-19';
 
 
 /**
@@ -1239,7 +1239,7 @@ REGEX_URL = /^
 $/
 */
 
-REGEX_URL = /^([\w\+\.\-]+:)\/\/([^\/?#:]+)(?::(\d+))?(\/[^?#]*)?(\?[^#]*)?(#.*)?$/;
+REGEX_URL = /^([\w\+\.\-]+:)?\/\/([^\/?#:]+)(?::(\d+))?(\/[^?#]*)?(\?[^#]*)?(#.*)?$/;
 
 
 /**

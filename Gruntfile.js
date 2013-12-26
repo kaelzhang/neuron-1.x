@@ -56,9 +56,9 @@ module.exports = function( grunt ) {
                     "lib/loader/active-config.js",
                     
                     "lib/biz/biz.js",
-                    // "lib/biz/hippo.js",
 
-                    "lib/cleaner.js"
+                    "lib/cleaner.js",
+                    "lib/hippo2.js"
                 ]
             },
 

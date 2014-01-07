@@ -1,6 +1,6 @@
 {
   "name": "neuronjs-1.x",
-  "version": "1.5.1",
+  "version": "1.5.2",
   "description": "Neuron is a very simple [CommonJS](http://wiki.commonjs.org) module loader.",
   "main": "dist/neuron",
   "directories": {

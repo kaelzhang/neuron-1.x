@@ -152,7 +152,7 @@ K._type = function(){
 /**
  * build time will be replaced when packaging and compressing
  */
-K.build = '2013-12-26';
+K.build = '2014-01-07';
 
 
 /**
@@ -6892,11 +6892,11 @@ generateQuery = (function () {
         data = data || {};
 
         if ( request_id ) {
-            data.req_id = request_id;
+            data.reqid = request_id;
         }
 
         if ( guid ) {
-            data.server_guid = guid;
+            data.serverguid = guid;
         }
 
         var current = {
@@ -7037,7 +7037,9 @@ var HIPPO_METHODS = {
     _setPVInitData: function(data){
         // run once
         HIPPO_METHODS._setPVInitData = NOOP;
-        pv(data);
+        setTimeout(function () {
+            pv(data);
+        }, 0);
     },
 
     _autoPV: function (auto) {

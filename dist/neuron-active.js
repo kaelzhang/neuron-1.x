@@ -152,7 +152,7 @@ K._type = function(){
 /**
  * build time will be replaced when packaging and compressing
  */
-K.build = '2014-01-07';
+K.build = '2014-02-18';
 
 
 /**
@@ -3818,7 +3818,7 @@ function DOMEvent(event, win, config){
         // test function keys, on macosx and win
         self.code = event.which || event.keyCode;
         
-    } else if (real === 'click' || real === 'dblclick' || real === 'contextmenu' || /mouse/i.test(real) ){
+    } else if (real === 'click' || real === 'dblclick' || real === 'contextmenu' || /mouse/i.test(real) || real === wheel_event ){
         doc = getCompactElement(win.document);
         
         page.x = event.pageX != NULL ? event.pageX : event.clientX + doc.scrollLeft;
@@ -3827,7 +3827,7 @@ function DOMEvent(event, win, config){
         client.x = event.pageX != NULL ? event.pageX - win.pageXOffset : event.clientX;
         client.y = event.pageY != NULL ? event.pageY - win.pageYOffset : event.clientY;
         
-        if (real === 'DOMMouseScroll' || real === 'mousewheel'){
+        if (real === wheel_event){
             self.wheel = (event.wheelDelta) ? event.wheelDelta / 120 : - (event.detail || 0) / 3;
         }
         
@@ -3879,6 +3879,14 @@ DOMEvent.prototype = {
 };
 
 
+var wheel_event = K.UA.mozilla 
+    ? 'DOMMouseScroll'
+    : 'onwheel' in document 
+        ? 'wheel'
+        : 'onmousewheel' in document 
+            ? 'mousewheel'
+            : 'DOMMouseScroll';
+
 var DOM = K.DOM,
     SELECTOR = DOM.SELECTOR,
     storage  = DOM.__storage,
@@ -3904,7 +3912,7 @@ var DOM = K.DOM,
         },
         
         mousewheel: {
-            base: K.UA.mozilla ? 'DOMMouseScroll' : 'mousewheel'
+            base: wheel_event
         }
     },
     
@@ -6890,14 +6898,7 @@ generateQuery = (function () {
     // @param {Object=}
     return function(key, value, data){
         data = data || {};
-
-        if ( request_id ) {
-            data.reqid = request_id;
-        }
-
-        if ( guid ) {
-            data.serverguid = guid;
-        }
+        mix(data, custom_const);
 
         var current = {
             '__hlt': _domain,
@@ -7011,8 +7012,6 @@ document.hippo = document_hippo;
 var auto_pv = true;
 var auto_page_timing = true;
 var page_timing_version;
-var request_id;
-var guid;
 
 var Hippo = win[HIPPO_HOST_KEY];
 
@@ -7065,12 +7064,14 @@ var HIPPO_METHODS = {
     },
 
     _setRequestId: function (id) {
-        request_id = id;
+        setCustomConst('reqid', id);
     },
 
     _setGuid: function (id) {
-        guid = id;
+        setCustomConst('serverguid', id);
     },
+
+    _setCustomConst: setCustomConst,
     
     mv: function(data){
         send(MODULE_TRACK_KEY, ['', ''], data || data_attached);
@@ -7081,6 +7082,13 @@ var HIPPO_METHODS = {
         pv(data);
     }
 };
+
+
+var custom_const = {};
+
+function setCustomConst (key, value) {
+    custom_const[key] = value;
+}
 
 
 function pv (data) {

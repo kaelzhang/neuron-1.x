@@ -6448,9 +6448,10 @@ function getURI(path){
 
     // if on debug mode, no more decorations
     if( !debug_mode ){
+        var md5 = urls[path];
 
         // if has version information
-        if( md5 = urls[path] ){
+        if( md5 ){
             if(combos[md5]){
                 product_path = combos[md5];
             }else{

@@ -152,7 +152,7 @@ K._type = function(){
 /**
  * build time will be replaced when packaging and compressing
  */
-K.build = '2014-02-18';
+K.build = '2014-03-13';
 
 
 /**
@@ -3879,7 +3879,7 @@ DOMEvent.prototype = {
 };
 
 
-var wheel_event = K.UA.mozilla 
+var wheel_event = K.UA.mozilla && !document.documentMode
     ? 'DOMMouseScroll'
     : 'onwheel' in document 
         ? 'wheel'
